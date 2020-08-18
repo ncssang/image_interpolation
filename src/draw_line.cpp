@@ -20,10 +20,10 @@ std::vector<cv::Point> get_line_points(cv::Point point_a, cv::Point point_b)
     {
         if (point_a.x > point_b.x)
         {
-            float temp_x = point_a.x;
+            int temp_x = point_a.x;
             point_a.x = point_b.x;
             point_b.x = temp_x;
-            float temp_y = point_a.y;
+            int temp_y = point_a.y;
             point_a.y = point_b.y;
             point_b.y = temp_y;
         }
@@ -44,10 +44,10 @@ std::vector<cv::Point> get_line_points(cv::Point point_a, cv::Point point_b)
         float b_value = point_a.x - ((d_x / d_y) * point_a.y);
         if (point_a.y > point_b.y)
         {
-            float temp_x = point_a.x;
+            int temp_x = point_a.x;
             point_a.x = point_b.x;
             point_b.x = temp_x;
-            float temp_y = point_a.y;
+            int temp_y = point_a.y;
             point_a.y = point_b.y;
             point_b.y = temp_y;
         }
