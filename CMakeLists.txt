@@ -26,6 +26,8 @@ add_executable(change_contrast_video src/change_contrast_video.cpp)
 add_executable(the_oxford src/the_oxford.cpp)
 add_executable(histogram_equalization_image src/histogram_equalization_image.cpp)
 add_executable(histogram_calculation src/histogram_calculation.cpp)
+add_executable(draw_line src/draw_line.cpp)
+add_executable(draw_line_bresenham src/draw_line_bresenham.cpp)
 
 
 
@@ -39,3 +41,5 @@ target_link_libraries(change_contrast_image ${OpenCV_LIBS})
 target_link_libraries(change_contrast_video ${OpenCV_LIBS})
 target_link_libraries(histogram_equalization_image ${OpenCV_LIBS})
 target_link_libraries(histogram_calculation ${OpenCV_LIBS})
+target_link_libraries(draw_line ${OpenCV_LIBS})
+target_link_libraries(draw_line_bresenham ${OpenCV_LIBS})
