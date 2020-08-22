@@ -24,13 +24,11 @@ add_executable(change_brightness_image src/change_brightness_image.cpp)
 add_executable(change_contrast_image src/change_contrast_image.cpp)
 add_executable(change_contrast_video src/change_contrast_video.cpp)
 add_executable(the_oxford src/the_oxford.cpp)
-add_executable(histogram_equalization_image src/histogram_equalization_image.cpp)
-add_executable(histogram_calculation src/histogram_calculation.cpp)
-add_executable(draw_line src/draw_line.cpp)
-add_executable(draw_line_bresenham src/draw_line_bresenham.cpp)
-add_executable(draw_line_dda src/draw_line_dda.cpp)
-
-
+add_executable(histogram_equalization_image
+               src/histogram_equalization_image.cpp)
+add_executable(histogram_calculation src/histogram_calculation.cpp
+                                     src/draw_line.cpp)
+add_executable(draw_line_test src/draw_line_test.cpp src/draw_line.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(load_display_image ${OpenCV_LIBS})
@@ -43,5 +41,3 @@ target_link_libraries(change_contrast_video ${OpenCV_LIBS})
 target_link_libraries(histogram_equalization_image ${OpenCV_LIBS})
 target_link_libraries(histogram_calculation ${OpenCV_LIBS})
 target_link_libraries(draw_line ${OpenCV_LIBS})
-target_link_libraries(draw_line_bresenham ${OpenCV_LIBS})
-target_link_libraries(draw_line_dda ${OpenCV_LIBS})

@@ -1,82 +1,4 @@
-#include <fstream>
-#include <iostream>
-#include <opencv2/opencv.hpp>
-// #include <opencv2/core/core.hpp>
-// #include <opencv2/highgui/highgui.hpp>
-// #include "opencv2/xfeatures2d.hpp"
-#include <sstream>
-#include <vector>
-
-std::vector<cv::Point> get_line_points(cv::Point point_a, cv::Point point_b)
-{
-    std::vector<cv::Point> line_points;
-
-    float d_x = point_b.x - point_a.x;
-    float d_y = point_b.y - point_a.y;
-    if (d_x == 0 && d_y == 0)
-    {
-        cv::Point this_point;
-        this_point.x = point_a.x;
-        this_point.y = point_b.y;
-        line_points.push_back(this_point);
-    }
-    else if (abs(d_x) > abs(d_y)) //tinh y = ax + b
-    {
-        if (point_a.x > point_b.x)
-        {
-            float temp_x = point_a.x;
-            point_a.x = point_b.x;
-            point_b.x = temp_x;
-            float temp_y = point_a.y;
-            point_a.y = point_b.y;
-            point_b.y = temp_y;
-        }
-        float a_value = d_y / d_x;
-        float b_value = point_a.y - ((d_y / d_x) * point_a.x);
-        for (int i = point_a.x; i <= point_b.x; ++i)
-        {
-            cv::Point this_point;
-            int y_value = (int)std::floor((a_value * i + b_value) + 0.5);
-            this_point.x = i;
-            this_point.y = y_value;
-            line_points.push_back(this_point);
-        }
-    }
-    else
-    {
-        float a_value = d_x / d_y;
-        float b_value = point_a.x - ((d_x / d_y) * point_a.y);
-        if (point_a.y > point_b.y)
-        {
-            float temp_x = point_a.x;
-            point_a.x = point_b.x;
-            point_b.x = temp_x;
-            float temp_y = point_a.y;
-            point_a.y = point_b.y;
-            point_b.y = temp_y;
-        }
-        for (int i = point_a.y; i <= point_b.y; ++i)
-        {
-            cv::Point this_point;
-            int x_value = (int)std::floor((a_value * i + b_value) + 0.5);
-            this_point.y = i;
-            this_point.x = x_value;
-            line_points.push_back(this_point);
-        }
-    }
-    return line_points;
-}
-void draw_line(cv::Mat image, cv::Point point_1, cv::Point point_2, cv::Scalar colour)
-{
-    std::vector<cv::Point> line_points = get_line_points(point_1, point_2);
-    for (size_t i = 0; i < line_points.size(); ++i)
-    {
-        if(line_points[i].x >=0 && line_points[i].x < image.cols && line_points[i].y >= 0 && line_points[i].y < image.rows)
-        {
-            image.at<cv::Vec3b>(line_points[i]) = cv::Vec3b(colour[0], colour[1], colour[2]);
-        }
-    }
-}
+#include "image_interpolation/draw_line.hpp"
 
 int main()
 {
@@ -178,28 +100,24 @@ int main()
         point_b.x = i + 1;
         point_b.y = (int)std::floor((histograms_blue[i + 1] / ratio) + 0.5);
         std::cout << "b_x: " << point_b.x << ", b_y: " << point_b.y << std::endl;
-        draw_line(image_histogram, cv::Point(point_a), cv::Point(point_b), cv::Scalar(255, 0, 0));
+        // draw_line(image_histogram, cv::Point(point_a), cv::Point(point_b), cv::Scalar(255, 0, 0));
+        draw_line_bresenham(image_histogram, cv::Point(point_a), cv::Point(point_b), cv::Scalar(255, 0, 0));
 
         cv::Point point_c, point_d;
         point_c.x = i;
         point_c.y = (int)std::floor((histograms_green[i] / ratio) + 0.5);
         point_d.x = i + 1;
         point_d.y = (int)std::floor((histograms_green[i + 1] / ratio) + 0.5);
-        draw_line(image_histogram, cv::Point(point_c), cv::Point(point_d), cv::Scalar(0, 255, 0));
+        // draw_line(image_histogram, cv::Point(point_c), cv::Point(point_d), cv::Scalar(0, 255, 0));
+        draw_line_bresenham(image_histogram, cv::Point(point_c), cv::Point(point_d), cv::Scalar(0, 255, 0));
 
         cv::Point point_e, point_f;
         point_e.x = i;
         point_e.y = (int)std::floor((histograms_red[i] / ratio) + 0.5);
         point_f.x = i + 1;
         point_f.y = (int)std::floor((histograms_red[i + 1] / ratio) + 0.5);
-        draw_line(image_histogram, cv::Point(point_e), cv::Point(point_f), cv::Scalar(0, 0, 255));
-        // image_histogram.at<cv::Vec3b>(cv::Point(i, histograms_blue[i] / ratio)) = cv::Vec3b(255, 0, 0);
-        // image_histogram.at<cv::Vec3b>(cv::Point(i, histograms_green[i] / ratio)) = cv::Vec3b(0, 255, 0);
-        // image_histogram.at<cv::Vec3b>(cv::Point(i, histograms_red[i] / ratio)) = cv::Vec3b(0, 0, 255);
-
-        // cv::line(image_histogram, cv::Point(i, histograms_blue[i] / ratio), cv::Point(i + 1, histograms_blue[i + 1] / ratio), cv::Scalar(255, 0, 0), 1);
-        // cv::line(image_histogram, cv::Point(i, histograms_green[i] / ratio), cv::Point(i + 1, histograms_green[i + 1] / ratio), cv::Scalar(0, 255, 0), 1);
-        // cv::line(image_histogram, cv::Point(i, histograms_red[i] / ratio), cv::Point(i + 1, histograms_red[i + 1] / ratio), cv::Scalar(0, 0, 255), 1);
+        // draw_line(image_histogram, cv::Point(point_e), cv::Point(point_f), cv::Scalar(0, 0, 255));
+        draw_line_bresenham(image_histogram, cv::Point(point_e), cv::Point(point_f), cv::Scalar(0, 0, 255));
     }
     cv::flip(image_histogram, image_histogram, 0);
     cv::imwrite("image_histogram.png", image_histogram);
