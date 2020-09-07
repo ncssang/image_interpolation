@@ -29,6 +29,8 @@ add_executable(histogram_equalization_image
 add_executable(histogram_calculation src/histogram_calculation.cpp
                                      src/draw_line.cpp)
 add_executable(draw_line_test src/draw_line_test.cpp src/draw_line.cpp)
+add_executable(draw_circle src/draw_circle.cpp)
+add_executable(draw_circle_square src/draw_circle_square.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(load_display_image ${OpenCV_LIBS})
@@ -40,4 +42,7 @@ target_link_libraries(change_contrast_image ${OpenCV_LIBS})
 target_link_libraries(change_contrast_video ${OpenCV_LIBS})
 target_link_libraries(histogram_equalization_image ${OpenCV_LIBS})
 target_link_libraries(histogram_calculation ${OpenCV_LIBS})
-target_link_libraries(draw_line ${OpenCV_LIBS})
+target_link_libraries(draw_circle ${OpenCV_LIBS})
+target_link_libraries(draw_line_test ${OpenCV_LIBS})
+target_link_libraries(draw_circle_square ${OpenCV_LIBS})
+

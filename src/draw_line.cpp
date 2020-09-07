@@ -316,3 +316,10 @@ void draw_line_dda(cv::Mat image, cv::Point point_1, cv::Point point_2, cv::Scal
         image.at<cv::Vec3b>(line_points[i]) = cv::Vec3b(colour[0], colour[1], colour[2]);
     }
 }
+
+// ham tra ve nhieu gia tri
+void add_value(int& a, int& b, int value)
+{
+    a = a + value;
+    b += value;
+}
