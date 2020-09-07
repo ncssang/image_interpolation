@@ -72,20 +72,6 @@ std::vector<cv::Point> get_circle_points_square(cv::Point point_a, int r)
         this_point.y = (int)std::round(sqrt(r * r - this_point.x * this_point.x));
         add_points(circle_points_square, point_a, this_point);
     }
-
-    // for (int i = point_a.x - r; i < point_a.x + r; ++i)
-    // {
-    //     int d_x = point_a.x - i;
-    //     int y = (int)std::round(sqrt(r * r - d_x * d_x));
-    //     cv::Point point_1;
-    //     point_1.x = i;
-    //     point_1.y = point_a.y + y;
-    //     circle_points_square.push_back(point_1);
-    //     cv::Point point_2;
-    //     point_2.x = i;
-    //     point_2.y = point_a.y - y;
-    //     circle_points_square.push_back(point_2);
-    // }
     return circle_points_square;
 }
 
@@ -101,8 +87,35 @@ void draw_circle_square(cv::Mat image_circle, cv::Point point_1, int r, cv::Scal
     }
 }
 
+std::vector<cv::Point> get_circle_points(cv::Point point_a, int r)
+{
+    std::vector<cv::Point> circle_points;
+    for (float i = 0; i <= M_PI_4; i = i + (1.0 / r))
+    {
+        cv::Point this_point;
+        this_point.x = (int)std::round(cos(i) * r);
+        this_point.y = (int)std::round(sin(i) * r);
+        add_points(circle_points, point_a, this_point);
+    }
+    return circle_points;
+}
+
+void draw_circle_polar(cv::Mat image, cv::Point centre, int radius, cv::Scalar colour)
+{
+    std::vector<cv::Point> circle_points = get_circle_points(centre, radius);
+    for (size_t i = 0; i < circle_points.size(); ++i)
+    {
+        if (circle_points[i].x >= 0 && circle_points[i].x < image.cols && circle_points[i].y >= 0 && circle_points[i].y < image.rows)
+        {
+            image.at<cv::Vec3b>(circle_points[i]) = cv::Vec3b(colour[0], colour[1], colour[2]);
+        }
+    }
+}
+
 int main()
 {
+    std::cout << M_PI << std::endl;
+    std::cout << sin(M_PI_2) << std::endl;
     cv::Point point_a;
     std::cout << "Nhap a.x_1 = ";
     std::cin >> point_a.x;
@@ -112,7 +125,8 @@ int main()
     std::cout << "Nhap r = ";
     std::cin >> r;
     cv::Mat image_draw_circle_square(cv::Size(800, 800), CV_8UC3, cv::Scalar(0, 0, 0));
-    draw_circle_square(image_draw_circle_square, cv::Point(point_a), r, cv::Scalar(0, 100, 255));
+    // draw_circle_square(image_draw_circle_square, cv::Point(point_a), r, cv::Scalar(0, 100, 255));
+    draw_circle_polar(image_draw_circle_square, cv::Point(point_a), r, cv::Scalar(0, 100, 255));
     // cv::circle(image_draw_circle, point_a, r,cv::Scalar(0, 100, 255));
     cv::flip(image_draw_circle_square, image_draw_circle_square, 0);
     cv::imwrite("draw_circle_square.png", image_draw_circle_square);
