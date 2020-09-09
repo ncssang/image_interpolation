@@ -31,6 +31,7 @@ add_executable(histogram_calculation src/histogram_calculation.cpp
 add_executable(draw_line_test src/draw_line_test.cpp src/draw_line.cpp)
 add_executable(draw_circle src/draw_circle.cpp)
 add_executable(draw_circle_square src/draw_circle_square.cpp)
+add_executable(resize_image src/resize_image.cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(load_display_image ${OpenCV_LIBS})
@@ -45,4 +46,5 @@ target_link_libraries(histogram_calculation ${OpenCV_LIBS})
 target_link_libraries(draw_circle ${OpenCV_LIBS})
 target_link_libraries(draw_line_test ${OpenCV_LIBS})
 target_link_libraries(draw_circle_square ${OpenCV_LIBS})
+target_link_libraries(resize_image ${OpenCV_LIBS})
 
