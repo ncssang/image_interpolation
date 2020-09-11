@@ -16,14 +16,12 @@ int main()
         std::cin.get();
         return -1;
     }
-    std::cout << "input_image.cols = " << input_image.cols << "; input_image.rows = " << input_image.rows << std::endl;
     float ratio;
     do
     {
         std::cout << "Nhap ratio: " << std::endl;
         std::cin >> ratio;
     } while (ratio <= 0);
-
     cv::Mat output_image(cv::Size(input_image.cols * ratio, input_image.rows * ratio), input_image.type());
     float actual_ratio = (float)output_image.cols / input_image.cols;
     std::cout << "actual_ratio: " << actual_ratio << std::endl;
@@ -31,16 +29,20 @@ int main()
     {
         int col_input = (int)std::floor((float)(col_output + 0.5) / actual_ratio);
         // int col_input = (int)std::floor((float)((col_output + 0.5) * input_image.cols) / output_image.cols);
-        std::cout << "col_output: " << col_output << " " << col_input << std::endl;
         for (int row_output = 0; row_output < output_image.rows; ++row_output)
         {
             int row_input = (int)std::floor((float)(row_output + 0.5) / actual_ratio);
             // int row_input = (int)std::floor((float)((row_output + 0.5) * input_image.rows) / output_image.rows);
-            output_image.at<uchar>(cv::Point(col_output, row_output)) = input_image.at<uchar>(cv::Point(col_input, row_input));
+            if (input_image.type() == CV_8UC1)
+            {
+                output_image.at<uchar>(cv::Point(col_output, row_output)) = input_image.at<uchar>(cv::Point(col_input, row_input));
+            }
+            else if (input_image.type() == CV_8UC3)
+            {
+                output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = input_image.at<cv::Vec3b>(cv::Point(col_input, row_input));
+            }
         }
     }
-    std::cout << "out_image.cols = " << output_image.cols << "; out_image.rows = " << output_image.rows << std::endl;
-
     imshow("Input_Image", input_image);
     imshow("Output_Image", output_image);
 
