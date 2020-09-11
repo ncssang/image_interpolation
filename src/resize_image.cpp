@@ -9,14 +9,14 @@
 
 int main()
 {
-    cv::Mat input_image = cv::imread("Histogram_Calculation_Original_Image.jpg", 0);
+    cv::Mat input_image = cv::imread("00.png", 0);
     if (input_image.empty())
     {
         std::cout << "Could not open or find the image" << std::endl;
         std::cin.get();
         return -1;
     }
-    std::cout << "out_image.cols = " << input_image.cols << "; out_image.rows = " << input_image.rows << std::endl;
+    std::cout << "input_image.cols = " << input_image.cols << "; input_image.rows = " << input_image.rows << std::endl;
     float ratio;
     do
     {
@@ -26,14 +26,21 @@ int main()
 
     cv::Mat output_image(cv::Size(input_image.cols * ratio, input_image.rows * ratio), input_image.type());
     float actual_ratio = (float)output_image.cols / input_image.cols;
-    for (int col = 0; col < output_image.cols; ++col)
+    std::cout << "actual_ratio: " << actual_ratio << std::endl;
+    for (int col_output = 0; col_output < output_image.cols; ++col_output)
     {
-        for (int row = 0; row < output_image.rows; ++row)
+        int col_input = (int)std::floor((float)(col_output + 0.5) / actual_ratio);
+        // int col_input = (int)std::floor((float)((col_output + 0.5) * input_image.cols) / output_image.cols);
+        std::cout << "col_output: " << col_output << " " << col_input << std::endl;
+        for (int row_output = 0; row_output < output_image.rows; ++row_output)
         {
-            output_image.at<uchar>(cv::Point(col, row)) = input_image.at<uchar>(cv::Point((int)std::round((col + 1) / actual_ratio) - 1, (int)std::round((row + 1) / actual_ratio) - 1));
+            int row_input = (int)std::floor((float)(row_output + 0.5) / actual_ratio);
+            // int row_input = (int)std::floor((float)((row_output + 0.5) * input_image.rows) / output_image.rows);
+            output_image.at<uchar>(cv::Point(col_output, row_output)) = input_image.at<uchar>(cv::Point(col_input, row_input));
         }
     }
     std::cout << "out_image.cols = " << output_image.cols << "; out_image.rows = " << output_image.rows << std::endl;
+
     imshow("Input_Image", input_image);
     imshow("Output_Image", output_image);
 
