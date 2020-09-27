@@ -9,7 +9,7 @@
 
 int main()
 {
-    cv::Mat input_image = cv::imread("00.png", 0);
+    cv::Mat input_image = cv::imread("00.png");
     if (input_image.empty())
     {
         std::cout << "Could not open or find the image" << std::endl;
@@ -28,6 +28,7 @@ int main()
     for (int col_output = 0; col_output < output_image.cols; ++col_output)
     {
         int col_input = (int)std::floor((float)(col_output + 0.5) / actual_ratio);
+        // std::cout << col_output + 0.5 << " " << (float)(col_output + 0.5) / actual_ratio << std::endl;
         // int col_input = (int)std::floor((float)((col_output + 0.5) * input_image.cols) / output_image.cols);
         for (int row_output = 0; row_output < output_image.rows; ++row_output)
         {
