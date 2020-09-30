@@ -19,23 +19,9 @@ int get_value_special(int p_00, int p_01, float d_y)
     int p_X = (1 - d_y) * p_00 + d_y * p_01;
     return p_X;
 }
-int main()
+
+void resize_bilinear(cv::Mat output_image, cv::Mat input_image)
 {
-    cv::Mat input_image = cv::imread("Histogram_Calculation_Original_Image.jpg");
-    if (input_image.empty())
-    {
-        std::cout << "Could not open or find the image" << std::endl;
-        std::cin.get();
-        return -1;
-    }
-    std::cout << "input_image. cols = " << input_image.cols << "input_image.rows = " << input_image.rows << std::endl;
-    float ratio;
-    do
-    {
-        std::cout << "enter ratio: " << std::endl;
-        std::cin >> ratio;
-    } while (ratio <= 0);
-    cv::Mat output_image(cv::Size(input_image.cols * ratio, input_image.rows * ratio), input_image.type());
     float actual_ratio = (float)output_image.cols / input_image.cols;
     for (int col_output = 0; col_output < output_image.cols; ++col_output)
     {
@@ -73,16 +59,10 @@ int main()
                     else if (input_image.type() == CV_8UC3)
                     {
                         cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        int fx00_b = fx00_3c[0];
-                        int fx00_g = fx00_3c[1];
-                        int fx00_r = fx00_3c[2];
                         cv::Vec3b fx01_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_1));
-                        int fx01_b = fx01_3c[0];
-                        int fx01_g = fx01_3c[1];
-                        int fx01_r = fx01_3c[2];
-                        int fx_interpolation_b = get_value_special(fx00_b, fx01_b, d_y);
-                        int fx_interpolation_g = get_value_special(fx00_g, fx01_g, d_y);
-                        int fx_interpolation_r = get_value_special(fx00_r, fx01_r, d_y);
+                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx01_3c[0], d_y);
+                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx01_3c[1], d_y);
+                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx01_3c[2], d_y);
                         output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
                     }
                 }
@@ -121,16 +101,10 @@ int main()
                     else if (input_image.type() == CV_8UC3)
                     {
                         cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        int fx00_b = fx00_3c[0];
-                        int fx00_g = fx00_3c[1];
-                        int fx00_r = fx00_3c[2];
                         cv::Vec3b fx10_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_0));
-                        int fx10_b = fx10_3c[0];
-                        int fx10_g = fx10_3c[1];
-                        int fx10_r = fx10_3c[2];
-                        int fx_interpolation_b = get_value_special(fx00_b, fx10_b, d_x);
-                        int fx_interpolation_g = get_value_special(fx00_g, fx10_g, d_x);
-                        int fx_interpolation_r = get_value_special(fx00_r, fx10_r, d_x);
+                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx10_3c[0], d_x);
+                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx10_3c[1], d_x);
+                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx10_3c[2], d_x);
                         output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
                     }
                 }
@@ -151,24 +125,12 @@ int main()
                     else if (input_image.type() == CV_8UC3)
                     {
                         cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        int fx00_b = fx00_3c[0];
-                        int fx00_g = fx00_3c[1];
-                        int fx00_r = fx00_3c[2];
                         cv::Vec3b fx01_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_1));
-                        int fx01_b = fx01_3c[0];
-                        int fx01_g = fx01_3c[1];
-                        int fx01_r = fx01_3c[2];
                         cv::Vec3b fx10_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_0));
-                        int fx10_b = fx10_3c[0];
-                        int fx10_g = fx10_3c[1];
-                        int fx10_r = fx10_3c[2];
                         cv::Vec3b fx11_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_1));
-                        int fx11_b = fx11_3c[0];
-                        int fx11_g = fx11_3c[1];
-                        int fx11_r = fx11_3c[2];
-                        int fx_interpolation_b = get_value(fx00_b, fx01_b, fx10_b, fx11_b, d_x, d_y);
-                        int fx_interpolation_g = get_value(fx00_g, fx01_g, fx10_g, fx11_g, d_x, d_y);
-                        int fx_interpolation_r = get_value(fx00_r, fx01_r, fx10_r, fx11_r, d_x, d_y);
+                        int fx_interpolation_b = get_value(fx00_3c[0], fx01_3c[0], fx10_3c[0], fx11_3c[0], d_x, d_y);
+                        int fx_interpolation_g = get_value(fx00_3c[1], fx01_3c[1], fx10_3c[1], fx11_3c[1], d_x, d_y);
+                        int fx_interpolation_r = get_value(fx00_3c[2], fx01_3c[2], fx10_3c[2], fx11_3c[2], d_x, d_y);
                         output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
                     }
                 }
@@ -184,17 +146,12 @@ int main()
                     }
                     else if (input_image.type() == CV_8UC3)
                     {
+
                         cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        int fx00_b = fx00_3c[0];
-                        int fx00_g = fx00_3c[1];
-                        int fx00_r = fx00_3c[2];
                         cv::Vec3b fx10_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_0));
-                        int fx10_b = fx10_3c[0];
-                        int fx10_g = fx10_3c[1];
-                        int fx10_r = fx10_3c[2];
-                        int fx_interpolation_b = get_value_special(fx00_b, fx10_b, d_x);
-                        int fx_interpolation_g = get_value_special(fx00_g, fx10_g, d_x);
-                        int fx_interpolation_r = get_value_special(fx00_r, fx10_r, d_x);
+                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx10_3c[0], d_x);
+                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx10_3c[1], d_x);
+                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx10_3c[2], d_x);
                         output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
                     }
                 }
@@ -233,16 +190,10 @@ int main()
                     else if (input_image.type() == CV_8UC3)
                     {
                         cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        int fx00_b = fx00_3c[0];
-                        int fx00_g = fx00_3c[1];
-                        int fx00_r = fx00_3c[2];
                         cv::Vec3b fx01_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_1));
-                        int fx01_b = fx01_3c[0];
-                        int fx01_g = fx01_3c[1];
-                        int fx01_r = fx01_3c[2];
-                        int fx_interpolation_b = get_value_special(fx00_b, fx01_b, d_y);
-                        int fx_interpolation_g = get_value_special(fx00_g, fx01_g, d_y);
-                        int fx_interpolation_r = get_value_special(fx00_r, fx01_r, d_y);
+                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx01_3c[0], d_y);
+                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx01_3c[1], d_y);
+                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx01_3c[2], d_y);
                         output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
                     }
                 }
@@ -263,7 +214,25 @@ int main()
     }
     imshow("Input_Image", input_image);
     imshow("Output_Image", output_image);
-
     cv::waitKey(0);
+}
+int main()
+{
+    cv::Mat input_image = cv::imread("00.png");
+    if (input_image.empty())
+    {
+        std::cout << "Could not open or find the image" << std::endl;
+        std::cin.get();
+        return -1;
+    }
+    std::cout << "input_image. cols = " << input_image.cols << "input_image.rows = " << input_image.rows << std::endl;
+    float ratio;
+    do
+    {
+        std::cout << "enter ratio: " << std::endl;
+        std::cin >> ratio;
+    } while (ratio <= 0);
+    cv::Mat output_image(cv::Size(input_image.cols * ratio, input_image.rows * ratio), input_image.type());
+    resize_bilinear(output_image, input_image);
     return 0;
 }
