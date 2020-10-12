@@ -113,7 +113,7 @@ void resize_bilinear(cv::Mat output_image, cv::Mat input_image)
                     int row_input_0 = (int)std::floor(row_input - 0.5);
                     int row_input_1 = row_input_0 + 1;
                     float d_y = row_input - (row_input_0 + 0.5);
-                    std::cout << "d_y: " << d_y << std::endl;
+                    // std::cout << "d_y: " << d_y << std::endl;
                     if (input_image.type() == CV_8UC1)
                     {
                         int fx00 = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
@@ -219,7 +219,7 @@ void resize_bilinear(cv::Mat output_image, cv::Mat input_image)
 }
 int main()
 {
-    cv::Mat input_image = cv::imread("01.jpg", 0);
+    cv::Mat input_image = cv::imread("00.png", 0);
     if (input_image.empty())
     {
         std::cout << "Could not open or find the image" << std::endl;
