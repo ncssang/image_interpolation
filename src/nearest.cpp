@@ -9,7 +9,7 @@
 
 int main()
 {
-    cv::Mat input_image = cv::imread("Histogram_Calculation_Original_Image.jpg", 0);
+    cv::Mat input_image = cv::imread("01.jpg");
     if (input_image.empty())
     {
         std::cout << "Could not open or find the image" << std::endl;
