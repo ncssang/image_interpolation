@@ -8,6 +8,15 @@
 #include <time.h>
 #include <vector>
 
+struct Pixel
+{
+    float column;
+    float row;
+    Pixel(const float column = 0, const float row = 0) : column(column), row(row)
+    {
+    }
+};
+
 int get_value(int point_0, int point_1, int point_2, int point_3, float x)
 {
     float a = -0.5 * point_0 + 1.5 * point_1 - 1.5 * point_2 + 0.5 * point_3;
@@ -26,167 +35,135 @@ int get_value(int point_0, int point_1, int point_2, int point_3, float x)
     return value;
 }
 
-int fx_interpolation_8UC1(cv::Mat input_image, int col_input_0, int col_input_1, int col_input_2, int col_input_3, int row_input_0, int row_input_1, int row_input_2, int row_input_3, float d_x, float d_y)
+void resize_bicubic(cv::Mat& input_image, cv::Mat& output_image, const cv::Size& size)
 {
-    int fx00 = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-    int fx01 = input_image.at<uchar>(cv::Point(col_input_0, row_input_1));
-    int fx02 = input_image.at<uchar>(cv::Point(col_input_0, row_input_2));
-    int fx03 = input_image.at<uchar>(cv::Point(col_input_0, row_input_3));
-
-    int fx10 = input_image.at<uchar>(cv::Point(col_input_1, row_input_0));
-    int fx11 = input_image.at<uchar>(cv::Point(col_input_1, row_input_1));
-    int fx12 = input_image.at<uchar>(cv::Point(col_input_1, row_input_2));
-    int fx13 = input_image.at<uchar>(cv::Point(col_input_1, row_input_3));
-
-    int fx20 = input_image.at<uchar>(cv::Point(col_input_2, row_input_0));
-    int fx21 = input_image.at<uchar>(cv::Point(col_input_2, row_input_1));
-    int fx22 = input_image.at<uchar>(cv::Point(col_input_2, row_input_2));
-    int fx23 = input_image.at<uchar>(cv::Point(col_input_2, row_input_3));
-
-    int fx30 = input_image.at<uchar>(cv::Point(col_input_3, row_input_0));
-    int fx31 = input_image.at<uchar>(cv::Point(col_input_3, row_input_1));
-    int fx32 = input_image.at<uchar>(cv::Point(col_input_3, row_input_2));
-    int fx33 = input_image.at<uchar>(cv::Point(col_input_3, row_input_3));
-
-    int x_y_0 = get_value(fx00, fx01, fx02, fx03, d_y);
-    int x_y_1 = get_value(fx10, fx11, fx12, fx13, d_y);
-    int x_y_2 = get_value(fx20, fx21, fx22, fx23, d_y);
-    int x_y_3 = get_value(fx30, fx31, fx32, fx33, d_y);
-    int fx = get_value(x_y_0, x_y_1, x_y_2, x_y_3, d_x);
-    return fx;
-}
-
-cv::Vec3b bicubic_3c(cv::Mat input_image, int col_input_0, int col_input_1, int col_input_2, int col_input_3, int row_input_0, int row_input_1, int row_input_2, int row_input_3, float d_x, float d_y)
-{
-    cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-    cv::Vec3b fx01_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_1));
-    cv::Vec3b fx02_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_2));
-    cv::Vec3b fx03_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_3));
-    int fx_interpolation_b1 = get_value(fx00_3c[0], fx01_3c[0], fx02_3c[0], fx03_3c[0], d_y);
-    int fx_interpolation_g1 = get_value(fx00_3c[1], fx01_3c[1], fx02_3c[1], fx03_3c[1], d_y);
-    int fx_interpolation_r1 = get_value(fx00_3c[2], fx01_3c[2], fx02_3c[2], fx03_3c[2], d_y);
-
-    cv::Vec3b fx10_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_0));
-    cv::Vec3b fx11_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_1));
-    cv::Vec3b fx12_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_2));
-    cv::Vec3b fx13_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_3));
-    int fx_interpolation_b2 = get_value(fx10_3c[0], fx11_3c[0], fx12_3c[0], fx13_3c[0], d_y);
-    int fx_interpolation_g2 = get_value(fx10_3c[1], fx11_3c[1], fx12_3c[1], fx13_3c[1], d_y);
-    int fx_interpolation_r2 = get_value(fx10_3c[2], fx11_3c[2], fx12_3c[2], fx13_3c[2], d_y);
-
-    cv::Vec3b fx20_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_2, row_input_0));
-    cv::Vec3b fx21_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_2, row_input_1));
-    cv::Vec3b fx22_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_2, row_input_2));
-    cv::Vec3b fx23_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_2, row_input_3));
-    int fx_interpolation_b3 = get_value(fx20_3c[0], fx21_3c[0], fx22_3c[0], fx23_3c[0], d_y);
-    int fx_interpolation_g3 = get_value(fx20_3c[1], fx21_3c[1], fx22_3c[1], fx23_3c[1], d_y);
-    int fx_interpolation_r3 = get_value(fx20_3c[2], fx21_3c[2], fx22_3c[2], fx23_3c[2], d_y);
-
-    cv::Vec3b fx30_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_3, row_input_0));
-    cv::Vec3b fx31_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_3, row_input_1));
-    cv::Vec3b fx32_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_3, row_input_2));
-    cv::Vec3b fx33_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_3, row_input_3));
-    int fx_interpolation_b4 = get_value(fx30_3c[0], fx31_3c[0], fx32_3c[0], fx33_3c[0], d_y);
-    int fx_interpolation_g4 = get_value(fx30_3c[1], fx31_3c[1], fx32_3c[1], fx33_3c[1], d_y);
-    int fx_interpolation_r4 = get_value(fx30_3c[2], fx31_3c[2], fx32_3c[2], fx33_3c[2], d_y);
-
-    int fx_interpolation_b = get_value(fx_interpolation_b1, fx_interpolation_b2, fx_interpolation_b3, fx_interpolation_b4, d_x);
-    int fx_interpolation_g = get_value(fx_interpolation_g1, fx_interpolation_g2, fx_interpolation_g3, fx_interpolation_g4, d_x);
-    int fx_interpolation_r = get_value(fx_interpolation_r1, fx_interpolation_r2, fx_interpolation_r3, fx_interpolation_r4, d_x);
-    cv::Vec3b fx_3c = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
-    return fx_3c;
-}
-
-void resize_bicubic(cv::Mat input_image, cv::Mat output_image)
-{
-    float actual_ratio = (float)output_image.cols / input_image.cols;
-    for (int col_output = 0; col_output < output_image.cols; ++col_output)
+    std::vector<Pixel> pixel_map;
+    size_t map_size = size.width * size.height;
+    pixel_map.reserve(map_size);
+    for (size_t i = 0; i < map_size; ++i)
     {
-        for (int row_output = 0; row_output < output_image.rows; ++row_output)
+        int column_new = i % size.width;
+        int row_new = i / size.width;
+        float column = ((float)(input_image.cols) / (size.width) * (column_new + 0.5)) - 0.5;
+        float row = ((float)(input_image.rows) / (size.height) * (row_new + 0.5)) - 0.5;
+        pixel_map.emplace_back(Pixel(column, row));
+    }
+    int number_of_channels = input_image.channels();
+    int image_type = input_image.type();
+    output_image.create(size, image_type);
+
+    // float actual_ratio = (float)output_image.cols / input_image.cols;
+    for (int row_output = 0; row_output < output_image.cols; ++row_output)
+    {
+        for (int col_output = 0; col_output < output_image.rows; ++col_output)
         {
-            float col_input = (col_output + 0.5) / actual_ratio;
-            int col_input_0, col_input_1, col_input_2, col_input_3;
-            float d_x;
-            if (col_input < 0.5)
+            // float col_input = (col_output + 0.5) / actual_ratio;
+            // float d_x;
+            int output_index = row_output * output_image.cols + col_output;
+            float input_image_row = pixel_map[output_index].row;
+            float input_image_col = pixel_map[output_index].column;
+            int input_x0, input_x1, input_x2, input_x3;
+            if (std::floor(input_image_col) == -1)
             {
-                col_input = 0.5;
+                input_x0 = 0;
+                input_x1 = 0;
+                input_x2 = 0;
+                input_x3 = 1;
             }
-            if (col_input > input_image.cols - 0.5)
+            else if (std::floor(input_image_col) == 0)
             {
-                col_input = input_image.cols - 0.5;
+                input_x0 = 0;
+                input_x1 = 0;
+                input_x2 = 1;
+                input_x3 = 2;
             }
-            if (col_input < 1.5)
+            else if (std::floor(input_image_col) == input_image.cols - 2)
             {
-                col_input_0 = 0;
-                col_input_1 = 0;
-                col_input_2 = 1;
-                col_input_3 = 2;
+                input_x0 = input_image.cols - 3;
+                input_x1 = input_image.cols - 2;
+                input_x2 = input_image.cols - 1;
+                input_x3 = input_image.cols - 1;
             }
-            else if (col_input >= 1.5 && col_input < input_image.cols - 1.5)
+            else if (std::floor(input_image_col) == input_image.cols - 1)
             {
-                col_input_0 = (int)std::floor(col_input - 1.5);
-                col_input_1 = col_input_0 + 1;
-                col_input_2 = col_input_0 + 2;
-                col_input_3 = col_input_0 + 3;
+                input_x0 = input_image.cols - 2;
+                input_x1 = input_image.cols - 1;
+                input_x2 = input_image.cols - 1;
+                input_x3 = input_image.cols - 1;
             }
-            else if (col_input >= input_image.cols - 1.5)
+            else
             {
-                col_input_0 = input_image.cols - 3;
-                col_input_1 = col_input_0 + 1;
-                col_input_2 = col_input_0 + 2;
-                col_input_3 = col_input_0 + 2;
+                input_x0 = std::floor(input_image_col) - 1;
+                input_x1 = input_x0 + 1;
+                input_x2 = input_x0 + 2;
+                input_x3 = input_x0 + 3;
             }
-            d_x = col_input - (col_input_1 + 0.5);
-
-            float row_input = (row_output + 0.5) / actual_ratio;
-            int row_input_0, row_input_1, row_input_2, row_input_3;
-            float d_y;
-            if (row_input < 0.5)
+            int input_y0, input_y1, input_y2, input_y3;
+            if (std::floor(input_image_row) == -1)
             {
-                row_input = 0.5;
+                input_y0 = 0;
+                input_y1 = 0;
+                input_y2 = 0;
+                input_y3 = 1;
             }
-            if (row_input > input_image.rows - 0.5)
+            else if (std::floor(input_image_row) == 0)
             {
-                row_input = input_image.rows - 0.5;
+                input_y0 = 0;
+                input_y1 = 0;
+                input_y2 = 1;
+                input_y3 = 2;
             }
-
-            if (row_input < 1.5)
+            else if (std::floor(input_image_row) == input_image.rows - 2)
             {
-                row_input_0 = 0;
-                row_input_1 = 0;
-                row_input_2 = 1;
-                row_input_3 = 2;
+                input_y0 = input_image.rows - 3;
+                input_y1 = input_image.rows - 2;
+                input_y2 = input_image.rows - 1;
+                input_y3 = input_image.rows - 1;
             }
-            else if (row_input >= 1.5 && row_input < input_image.rows - 1.5)
+            else if (std::floor(input_image_row) == input_image.rows - 1)
             {
-                row_input_0 = (int)std::floor(row_input - 1.5);
-                row_input_1 = row_input_0 + 1;
-                row_input_2 = row_input_0 + 2;
-                row_input_3 = row_input_0 + 3;
+                input_y0 = input_image.rows - 2;
+                input_y1 = input_image.rows - 1;
+                input_y2 = input_image.rows - 1;
+                input_y3 = input_image.rows - 1;
             }
-            else if (row_input >= input_image.rows - 1.5)
+            else
             {
-                row_input_0 = input_image.rows - 3;
-                row_input_1 = row_input_0 + 1;
-                row_input_2 = row_input_0 + 2;
-                row_input_3 = row_input_0 + 2;
+                input_y0 = std::floor(input_image_row) - 1;
+                input_y1 = input_y0 + 1;
+                input_y2 = input_y0 + 2;
+                input_y3 = input_y0 + 3;
             }
-            d_y = row_input - (row_input_1 + 0.5);
-            if (input_image.type() == CV_8UC1)
+            float d_x = input_image_col - std::floor(input_image_col);
+            float d_y = input_image_row - std::floor(input_image_row);
+            for (int i = 0; i < number_of_channels; ++i)
             {
-                int fx_1c = fx_interpolation_8UC1(input_image, col_input_0, col_input_1, col_input_2, col_input_3, row_input_0, row_input_1, row_input_2, row_input_3, d_x, d_y);
-                output_image.at<uchar>(cv::Point(col_output, row_output)) = fx_1c;
-            }
-            else if (input_image.type() == CV_8UC3)
-            {
-                cv::Vec3b fx_3c = bicubic_3c(input_image, col_input_0, col_input_1, col_input_2, col_input_3, row_input_0, row_input_1, row_input_2, row_input_3, d_x, d_y);
-                output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = fx_3c;
+                // Calculate the cubic interpolation for each row
+                uchar source_x_y_0 = get_value(input_image.data[(input_y0 * input_image.cols + input_x0) * number_of_channels + i],
+                                               input_image.data[(input_y0 * input_image.cols + input_x1) * number_of_channels + i],
+                                               input_image.data[(input_y0 * input_image.cols + input_x2) * number_of_channels + i],
+                                               input_image.data[(input_y0 * input_image.cols + input_x3) * number_of_channels + i],
+                                               d_x);
+                uchar source_x_y_1 = get_value(input_image.data[(input_y1 * input_image.cols + input_x0) * number_of_channels + i],
+                                               input_image.data[(input_y1 * input_image.cols + input_x1) * number_of_channels + i],
+                                               input_image.data[(input_y1 * input_image.cols + input_x2) * number_of_channels + i],
+                                               input_image.data[(input_y1 * input_image.cols + input_x3) * number_of_channels + i],
+                                               d_x);
+                uchar source_x_y_2 = get_value(input_image.data[(input_y2 * input_image.cols + input_x0) * number_of_channels + i],
+                                               input_image.data[(input_y2 * input_image.cols + input_x1) * number_of_channels + i],
+                                               input_image.data[(input_y2 * input_image.cols + input_x2) * number_of_channels + i],
+                                               input_image.data[(input_y2 * input_image.cols + input_x3) * number_of_channels + i],
+                                               d_x);
+                uchar source_x_y_3 = get_value(input_image.data[(input_y3 * input_image.cols + input_x0) * number_of_channels + i],
+                                               input_image.data[(input_y3 * input_image.cols + input_x1) * number_of_channels + i],
+                                               input_image.data[(input_y3 * input_image.cols + input_x2) * number_of_channels + i],
+                                               input_image.data[(input_y3 * input_image.cols + input_x3) * number_of_channels + i],
+                                               d_x);
+                uchar source_value = get_value(source_x_y_0, source_x_y_1, source_x_y_2, source_x_y_3, d_y);
+                output_image.data[output_index * number_of_channels + i] = source_value;
             }
         }
     }
-    imshow("Input_Image", input_image);
-    imshow("Output_Image", output_image);
-    cv::waitKey(0);
 }
 
 int main()
@@ -205,11 +182,17 @@ int main()
         std::cout << "enter ratio: " << std::endl;
         std::cin >> ratio;
     } while (ratio <= 0);
-    cv::Mat output_image(cv::Size(input_image.cols * ratio, input_image.rows * ratio), input_image.type());
+    cv::Size output_size(input_image.cols * ratio, input_image.rows * ratio);
+    cv::Mat output_image;
 
     clock_t t = clock();
-    resize_bicubic(input_image, output_image);
+    resize_bicubic(input_image, output_image, output_size);
     t = clock() - t;
     std::cout << "time: " << t << std::endl;
+
+    imshow("Input_Image", input_image);
+    imshow("Output_Image", output_image);
+    cv::waitKey(0);
+
     return 0;
 }
