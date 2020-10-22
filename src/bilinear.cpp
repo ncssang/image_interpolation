@@ -7,215 +7,111 @@
 #include <sstream>
 #include <vector>
 
-int get_value(int p_00, int p_01, int p_10, int p_11, float d_x, float d_y)
+struct Pixel
 {
-    int p_A = (1 - d_x) * p_00 + d_x * p_10;
-    int p_B = (1 - d_x) * p_01 + d_x * p_11;
-    int p_AB = (1 - d_y) * p_A + d_y * p_B;
-    return p_AB;
-}
-int get_value_special(int p_00, int p_01, float d_y)
-{
-    int p_X = (1 - d_y) * p_00 + d_y * p_01;
-    return p_X;
-}
-
-void resize_bilinear(cv::Mat output_image, cv::Mat input_image)
-{
-    float actual_ratio = (float)output_image.cols / input_image.cols;
-    for (int col_output = 0; col_output < output_image.cols; ++col_output)
+    float column;
+    float row;
+    Pixel(const float column = 0, const float row = 0) : column(column), row(row)
     {
-        float col_input = (float)(col_output + 0.5) / actual_ratio;
-        if (col_input < 0.5)
-        {
-            int col_input_0 = 0;
-            for (int row_output = 0; row_output < output_image.rows; ++row_output)
-            {
-                float row_input = (float)(row_output + 0.5) / actual_ratio;
-                if (row_input < 0.5)
-                {
-                    int row_input_0 = 0;
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                    }
-                }
-                else if (row_input >= 0.5 && row_input <= input_image.rows - 0.5)
-                {
-                    int row_input_0 = (int)std::floor(row_input - 0.5);
-                    int row_input_1 = row_input_0 + 1;
-                    float d_y = row_input - (row_input_0 + 0.5);
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        int fx00 = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                        int fx01 = input_image.at<uchar>(cv::Point(col_input_0, row_input_1));
-                        int fx_interpolation = get_value_special(fx00, fx01, d_y);
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = fx_interpolation;
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        cv::Vec3b fx01_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_1));
-                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx01_3c[0], d_y);
-                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx01_3c[1], d_y);
-                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx01_3c[2], d_y);
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
-                    }
-                }
-                else if (row_input > input_image.rows - 0.5)
-                {
-                    int row_input_0 = input_image.rows - 1;
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                    }
-                }
-            }
-        }
-        else if (col_input >= 0.5 && col_input <= input_image.cols - 0.5)
-        {
-            int col_input_0 = (int)std::floor(col_input - 0.5);
-            int col_input_1 = col_input_0 + 1;
-            float d_x = col_input - (col_input_0 + 0.5);
-            for (int row_output = 0; row_output < output_image.rows; ++row_output)
-            {
-                float row_input = (float)(row_output + 0.5) / actual_ratio;
-                if (row_input < 0.5)
-                {
-                    int row_input_0 = 0;
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        int fx00 = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                        int fx10 = input_image.at<uchar>(cv::Point(col_input_1, row_input_0));
-                        int fx_interpolation = get_value_special(fx00, fx10, d_x);
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = fx_interpolation;
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        cv::Vec3b fx10_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_0));
-                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx10_3c[0], d_x);
-                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx10_3c[1], d_x);
-                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx10_3c[2], d_x);
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
-                    }
-                }
-                else if (row_input >= 0.5 && row_input <= input_image.rows - 0.5)
-                {
-                    int row_input_0 = (int)std::floor(row_input - 0.5);
-                    int row_input_1 = row_input_0 + 1;
-                    float d_y = row_input - (row_input_0 + 0.5);
-                    // std::cout << "d_y: " << d_y << std::endl;
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        int fx00 = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                        int fx01 = input_image.at<uchar>(cv::Point(col_input_0, row_input_1));
-                        int fx10 = input_image.at<uchar>(cv::Point(col_input_1, row_input_0));
-                        int fx11 = input_image.at<uchar>(cv::Point(col_input_1, row_input_1));
-                        int fx_interpolation = get_value(fx00, fx01, fx10, fx11, d_x, d_y);
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = fx_interpolation;
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        cv::Vec3b fx01_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_1));
-                        cv::Vec3b fx10_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_0));
-                        cv::Vec3b fx11_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_1));
-                        int fx_interpolation_b = get_value(fx00_3c[0], fx01_3c[0], fx10_3c[0], fx11_3c[0], d_x, d_y);
-                        int fx_interpolation_g = get_value(fx00_3c[1], fx01_3c[1], fx10_3c[1], fx11_3c[1], d_x, d_y);
-                        int fx_interpolation_r = get_value(fx00_3c[2], fx01_3c[2], fx10_3c[2], fx11_3c[2], d_x, d_y);
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
-                    }
-                }
-                else if (row_input > input_image.rows - 0.5)
-                {
-                    int row_input_0 = input_image.rows - 1;
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        int fx00 = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                        int fx01 = input_image.at<uchar>(cv::Point(col_input_1, row_input_0));
-                        int fx_interpolation = get_value_special(fx00, fx01, d_x);
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = fx_interpolation;
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-
-                        cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        cv::Vec3b fx10_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_1, row_input_0));
-                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx10_3c[0], d_x);
-                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx10_3c[1], d_x);
-                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx10_3c[2], d_x);
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
-                    }
-                }
-            }
-        }
-        else if (col_input > input_image.cols - 0.5)
-        {
-            int col_input_0 = input_image.cols - 1;
-            for (int row_output = 0; row_output < output_image.rows; ++row_output)
-            {
-                float row_input = (float)(row_output + 0.5) / actual_ratio;
-                if (row_input < 0.5)
-                {
-                    int row_input_0 = 0;
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                    }
-                }
-                else if (row_input >= 0.5 && row_input <= input_image.rows - 0.5)
-                {
-                    int row_input_0 = (int)std::floor(row_input - 0.5);
-                    int row_input_1 = row_input_0 + 1;
-                    float d_y = row_input - (row_input_0 + 0.5);
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        int fx00 = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                        int fx01 = input_image.at<uchar>(cv::Point(col_input_0, row_input_1));
-                        int fx_interpolation = get_value_special(fx00, fx01, d_y);
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = fx_interpolation;
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        cv::Vec3b fx00_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                        cv::Vec3b fx01_3c = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_1));
-                        int fx_interpolation_b = get_value_special(fx00_3c[0], fx01_3c[0], d_y);
-                        int fx_interpolation_g = get_value_special(fx00_3c[1], fx01_3c[1], d_y);
-                        int fx_interpolation_r = get_value_special(fx00_3c[2], fx01_3c[2], d_y);
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = cv::Vec3b(fx_interpolation_b, fx_interpolation_g, fx_interpolation_r);
-                    }
-                }
-                else if (row_input > input_image.rows - 0.5)
-                {
-                    int row_input_0 = input_image.rows - 1;
-                    if (input_image.type() == CV_8UC1)
-                    {
-                        output_image.at<uchar>(cv::Point(col_output, row_output)) = input_image.at<uchar>(cv::Point(col_input_0, row_input_0));
-                    }
-                    else if (input_image.type() == CV_8UC3)
-                    {
-                        output_image.at<cv::Vec3b>(cv::Point(col_output, row_output)) = input_image.at<cv::Vec3b>(cv::Point(col_input_0, row_input_0));
-                    }
-                }
-            }
-        }
     }
-    imshow("Input_Image", input_image);
-    imshow("Output_Image", output_image);
-    cv::waitKey(0);
+};
+
+uchar get_cubic_interpolation(uchar point_0, uchar point_1, uchar point_2, uchar point_3, float x)
+{
+    float a = -0.5 * point_0 + 1.5 * point_1 - 1.5 * point_2 + 0.5 * point_3;
+    float b = point_0 - 2.5 * point_1 + 2 * point_2 - 0.5 * point_3;
+    float c = -0.5 * point_0 + 0.5 * point_2;
+    float d = point_1;
+    int value = d + x * (c + x * (b + x * a));
+    if (value < 0)
+    {
+        value = 0;
+    }
+    if (value > 255)
+    {
+        value = 255;
+    }
+    return value;
+}
+
+void resize_bilinear(cv::Mat input_image, cv::Mat& output_image, const cv::Size& size)
+{
+    std::vector<Pixel> pixel_map;
+    size_t map_size = size.width * size.height;
+    pixel_map.reserve(map_size);
+    for (size_t i = 0; i < map_size; ++i)
+    {
+        int column_new = i % size.width;
+        int row_new = i / size.width;
+        float column = ((float)(input_image.cols) / (size.width) * (column_new + 0.5)) - 0.5;
+        float row = ((float)(input_image.rows) / (size.height) * (row_new + 0.5)) - 0.5;
+        pixel_map.emplace_back(Pixel(column, row));
+    }
+
+    int number_of_channels = input_image.channels();
+    int image_type = input_image.type();
+    output_image.create(size, image_type);
+
+        for (int output_row = 0; output_row < output_image.rows; ++output_row)
+        {
+            for (int output_col = 0; output_col < output_image.cols; ++output_col)
+            {
+                int destination_index = output_row * output_image.cols + output_col;
+                float source_row = pixel_map[destination_index].row;
+                float source_column = pixel_map[destination_index].column;
+
+                int input_top, input_bottom;
+                if (std::floor(source_row) == -1)
+                {
+                    // The top margin
+                    input_top = 0;
+                    input_bottom = 0;
+                }
+                else if (std::floor(source_row) == input_image.rows - 1)
+                {
+                    // The bottom margin
+                    input_top = input_image.rows - 1;
+                    input_bottom = input_image.rows - 1;
+                }
+                else
+                {
+                    input_top = std::floor(source_row);
+                    input_bottom = input_top + 1;
+                }
+
+                int input_left, input_right;
+                if (std::floor(source_column) == -1)
+                {
+                    // The left margin
+                    input_left = 0;
+                    input_right = 0;
+                }
+                else if (std::floor(source_column) == input_image.cols - 1)
+                {
+                    // The right margin
+                    input_left = input_image.cols - 1;
+                    input_right = input_image.cols - 1;
+                }
+                else
+                {
+                    input_left = std::floor(source_column);
+                    input_right = input_left + 1;
+                }
+
+                int source_top_left_index = input_top * input_image.cols + input_left;
+                int source_top_right_index = input_top * input_image.cols + input_right;
+                int source_bottom_left_index = input_bottom * input_image.cols + input_left;
+                int source_bottom_right_index = input_bottom * input_image.cols + input_right;
+                float d_x = source_column - input_left;
+                float d_y = source_row - input_top;
+                for (int i = 0; i < number_of_channels; ++i)
+                {
+                    // Assign to the weighted average
+                    output_image.data[destination_index * number_of_channels + i] = (1 - d_y) * ((1 - d_x) * input_image.data[source_top_left_index * number_of_channels + i] + d_x * input_image.data[source_top_right_index * number_of_channels + i]) +
+                                                                                   d_y * ((1 - d_x) * input_image.data[source_bottom_left_index * number_of_channels + i] + d_x * input_image.data[source_bottom_right_index * number_of_channels + i]);
+                }
+            }
+        }
 }
 int main()
 {
@@ -226,14 +122,19 @@ int main()
         std::cin.get();
         return -1;
     }
-    std::cout << "input_image. cols = " << input_image.cols << "input_image.rows = " << input_image.rows << std::endl;
     float ratio;
     do
     {
         std::cout << "enter ratio: " << std::endl;
         std::cin >> ratio;
     } while (ratio <= 0);
-    cv::Mat output_image(cv::Size(input_image.cols * ratio, input_image.rows * ratio), input_image.type());
-    resize_bilinear(output_image, input_image);
+
+    cv::Size output_size(input_image.cols * ratio, input_image.rows * ratio);
+    cv::Mat output_image;
+
+    resize_bilinear(input_image, output_image, output_size);
+    cv::imshow("input_image", input_image);
+    cv::imshow("output_image", output_image);
+    cv::waitKey(0);
     return 0;
 }
