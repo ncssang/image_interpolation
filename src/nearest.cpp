@@ -41,7 +41,7 @@ uchar get_cubic_interpolation(uchar point_0, uchar point_1, uchar point_2, uchar
     return value;
 }
 
-void resize_image(cv::Mat input_image, cv::Mat& output_image, const cv::Size& size, Method method = BILINEAR)
+void resize_image(cv::Mat input_image, cv::Mat& output_image, cv::Size& size, Method method)
 {
     std::vector<Pixel> pixel_map;
     size_t map_size = size.width * size.height;
@@ -255,7 +255,7 @@ void resize_image(cv::Mat input_image, cv::Mat& output_image, const cv::Size& si
 
 int main()
 {
-    cv::Mat input_image = cv::imread("00.png");
+    cv::Mat input_image = cv::imread("00.png", 1);
     if (input_image.empty())
     {
         std::cout << "Could not open or find the image" << std::endl;
