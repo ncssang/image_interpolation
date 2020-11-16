@@ -35,9 +35,8 @@ add_executable(nearest src/nearest.cpp)
 add_executable(image_test src/image_test.cpp)
 add_executable(bilinear src/bilinear.cpp)
 add_executable(bicubic src/bicubic.cpp)
-add_executable(rotate_image_nearest src/rotate_image_nearest.cpp)
-add_executable(rotate_image_bilinear src/rotate_image_bilinear.cpp)
-add_executable(rotate_image_bicubic src/rotate_image_bicubic.cpp)
+add_executable(rotate_image src/rotate_image.cpp)
+
 
 
 ## Specify libraries to link a library or executable target against
@@ -57,7 +56,6 @@ target_link_libraries(nearest ${OpenCV_LIBS})
 target_link_libraries(image_test ${OpenCV_LIBS})
 target_link_libraries(bilinear ${OpenCV_LIBS})
 target_link_libraries(bicubic ${OpenCV_LIBS})
-target_link_libraries(rotate_image_nearest ${OpenCV_LIBS})
-target_link_libraries(rotate_image_bilinear ${OpenCV_LIBS})
-target_link_libraries(rotate_image_bicubic ${OpenCV_LIBS})
+target_link_libraries(rotate_image ${OpenCV_LIBS})
+
 
