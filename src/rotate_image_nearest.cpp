@@ -261,101 +261,115 @@ void rotate_image(cv::Mat& input_image, cv::Mat& output_image, float angle, Meth
     }
     else
     {
-        for (int row_output = 0; row_output < output_image.cols; ++row_output)
+        for (int row_output = 0; row_output < output_image.rows; ++row_output)
         {
-            for (int col_output = 0; col_output < output_image.rows; ++col_output)
+            for (int col_output = 0; col_output < output_image.cols; ++col_output)
             {
                 int output_index = row_output * output_image.cols + col_output;
                 float input_image_row = pixel_map[output_index].row;
                 float input_image_col = pixel_map[output_index].column;
                 if (input_image_col >= 0 && input_image_col < input_image.cols && input_image_row >= 0 && input_image_row < input_image.rows)
                 {
+                    int output_index = row_output * output_image.cols + col_output;
+                    float input_image_row = pixel_map[output_index].row;
+                    float input_image_col = pixel_map[output_index].column;
                     int input_x0, input_x1, input_x2, input_x3;
-                    if (input_image_col >= 0 && input_image_col < 0.5)
+                    if (std::floor(input_image_col) == -1)
                     {
-                        input_image_col = 0.5;
+                        input_x0 = 0;
+                        input_x1 = 0;
+                        input_x2 = 0;
+                        input_x3 = 1;
                     }
-                    if (input_image_col > input_image.cols - 0.5)
-                    {
-                        input_image_col = input_image.cols - 0.5;
-                    }
-                    if (input_image_col < 1.5)
+                    else if (std::floor(input_image_col) == 0)
                     {
                         input_x0 = 0;
                         input_x1 = 0;
                         input_x2 = 1;
                         input_x3 = 2;
                     }
-                    else if (input_image_col >= 1.5 && input_image_col < input_image.cols - 1.5)
-                    {
-                        input_x0 = (int)std::floor(input_image_col - 1.5);
-                        input_x1 = input_x0 + 1;
-                        input_x2 = input_x0 + 2;
-                        input_x3 = input_x0 + 3;
-                    }
-                    else if (input_image_col >= input_image.cols - 1.5)
+                    else if (std::floor(input_image_col) == input_image.cols - 2)
                     {
                         input_x0 = input_image.cols - 3;
+                        input_x1 = input_image.cols - 2;
+                        input_x2 = input_image.cols - 1;
+                        input_x3 = input_image.cols - 1;
+                    }
+                    else if (std::floor(input_image_col) == input_image.cols - 1)
+                    {
+                        input_x0 = input_image.cols - 2;
+                        input_x1 = input_image.cols - 1;
+                        input_x2 = input_image.cols - 1;
+                        input_x3 = input_image.cols - 1;
+                    }
+                    else
+                    {
+                        input_x0 = std::floor(input_image_col) - 1;
                         input_x1 = input_x0 + 1;
                         input_x2 = input_x0 + 2;
                         input_x3 = input_x0 + 3;
                     }
-
                     int input_y0, input_y1, input_y2, input_y3;
-                    if (input_image_row >= 0 && input_image_row < 0.5)
+                    if (std::floor(input_image_row) == -1)
                     {
-                        input_image_row = 0.5;
+                        input_y0 = 0;
+                        input_y1 = 0;
+                        input_y2 = 0;
+                        input_y3 = 1;
                     }
-                    if (input_image_row > input_image.rows - 0.5)
-                    {
-                        input_image_row = input_image.rows - 0.5;
-                    }
-                    if (input_image_row < 1.5)
+                    else if (std::floor(input_image_row) == 0)
                     {
                         input_y0 = 0;
                         input_y1 = 0;
                         input_y2 = 1;
                         input_y3 = 2;
                     }
-                    else if (input_image_row >= 1.5 && input_image_row < input_image.rows - 1.5)
-                    {
-                        input_y0 = (int)std::floor(input_image_row - 1.5);
-                        input_y1 = input_y0 + 1;
-                        input_y2 = input_y0 + 2;
-                        input_y3 = input_y0 + 3;
-                    }
-                    else if (input_image_row >= input_image.rows - 1.5)
+                    else if (std::floor(input_image_row) == input_image.rows - 2)
                     {
                         input_y0 = input_image.rows - 3;
+                        input_y1 = input_image.rows - 2;
+                        input_y2 = input_image.rows - 1;
+                        input_y3 = input_image.rows - 1;
+                    }
+                    else if (std::floor(input_image_row) == input_image.rows - 1)
+                    {
+                        input_y0 = input_image.rows - 2;
+                        input_y1 = input_image.rows - 1;
+                        input_y2 = input_image.rows - 1;
+                        input_y3 = input_image.rows - 1;
+                    }
+                    else
+                    {
+                        input_y0 = std::floor(input_image_row) - 1;
                         input_y1 = input_y0 + 1;
                         input_y2 = input_y0 + 2;
                         input_y3 = input_y0 + 3;
                     }
-
                     float d_x = input_image_col - std::floor(input_image_col);
                     float d_y = input_image_row - std::floor(input_image_row);
                     for (int i = 0; i < number_of_channels; ++i)
                     {
+                        // Calculate the cubic interpolation for each row
                         uchar source_x_y_0 = get_value(input_image.data[(input_y0 * input_image.cols + input_x0) * number_of_channels + i],
-                                                       input_image.data[(input_y0 * input_image.cols + input_x1) * number_of_channels + i],
-                                                       input_image.data[(input_y0 * input_image.cols + input_x2) * number_of_channels + i],
-                                                       input_image.data[(input_y0 * input_image.cols + input_x3) * number_of_channels + i],
-                                                       d_x);
+                                                                     input_image.data[(input_y0 * input_image.cols + input_x1) * number_of_channels + i],
+                                                                     input_image.data[(input_y0 * input_image.cols + input_x2) * number_of_channels + i],
+                                                                     input_image.data[(input_y0 * input_image.cols + input_x3) * number_of_channels + i],
+                                                                     d_x);
                         uchar source_x_y_1 = get_value(input_image.data[(input_y1 * input_image.cols + input_x0) * number_of_channels + i],
-                                                       input_image.data[(input_y1 * input_image.cols + input_x1) * number_of_channels + i],
-                                                       input_image.data[(input_y1 * input_image.cols + input_x2) * number_of_channels + i],
-                                                       input_image.data[(input_y1 * input_image.cols + input_x3) * number_of_channels + i],
-                                                       d_x);
+                                                                     input_image.data[(input_y1 * input_image.cols + input_x1) * number_of_channels + i],
+                                                                     input_image.data[(input_y1 * input_image.cols + input_x2) * number_of_channels + i],
+                                                                     input_image.data[(input_y1 * input_image.cols + input_x3) * number_of_channels + i],
+                                                                     d_x);
                         uchar source_x_y_2 = get_value(input_image.data[(input_y2 * input_image.cols + input_x0) * number_of_channels + i],
-                                                       input_image.data[(input_y2 * input_image.cols + input_x1) * number_of_channels + i],
-                                                       input_image.data[(input_y2 * input_image.cols + input_x2) * number_of_channels + i],
-                                                       input_image.data[(input_y2 * input_image.cols + input_x3) * number_of_channels + i],
-                                                       d_x);
+                                                                     input_image.data[(input_y2 * input_image.cols + input_x1) * number_of_channels + i],
+                                                                     input_image.data[(input_y2 * input_image.cols + input_x2) * number_of_channels + i],
+                                                                     input_image.data[(input_y2 * input_image.cols + input_x3) * number_of_channels + i],
+                                                                     d_x);
                         uchar source_x_y_3 = get_value(input_image.data[(input_y3 * input_image.cols + input_x0) * number_of_channels + i],
-                                                       input_image.data[(input_y3 * input_image.cols + input_x1) * number_of_channels + i],
-                                                       input_image.data[(input_y3 * input_image.cols + input_x2) * number_of_channels + i],
-                                                       input_image.data[(input_y3 * input_image.cols + input_x3) * number_of_channels + i],
-                                                       d_x);
+                                                                     input_image.data[(input_y3 * input_image.cols + input_x1) * number_of_channels + i],
+                                                                     input_image.data[(input_y3 * input_image.cols + input_x2) * number_of_channels + i],
+                                                                     input_image.data[(input_y3 * input_image.cols + input_x3) * number_of_channels + i],
+                                                                     d_x);
                         uchar source_value = get_value(source_x_y_0, source_x_y_1, source_x_y_2, source_x_y_3, d_y);
                         output_image.data[output_index * number_of_channels + i] = source_value;
                     }
