@@ -37,8 +37,6 @@ add_executable(bilinear src/bilinear.cpp)
 add_executable(bicubic src/bicubic.cpp)
 add_executable(rotate_image src/rotate_image.cpp)
 
-
-
 ## Specify libraries to link a library or executable target against
 target_link_libraries(load_display_image ${OpenCV_LIBS})
 target_link_libraries(play_videos ${OpenCV_LIBS})
@@ -57,5 +55,3 @@ target_link_libraries(image_test ${OpenCV_LIBS})
 target_link_libraries(bilinear ${OpenCV_LIBS})
 target_link_libraries(bicubic ${OpenCV_LIBS})
 target_link_libraries(rotate_image ${OpenCV_LIBS})
-
-

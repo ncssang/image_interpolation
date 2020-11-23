@@ -25,11 +25,11 @@ int main()
                 1.0,                            // Scale. 2.0 = 2x bigger
                 cv::Scalar(0, 0, 255),      // BGR Color
                 1,                              // Line Thickness (Optional)
-                CV_AA);                     // Anti-alias (Optional)
+                cv::LINE_AA);                     // Anti-alias (Optional)
     cv::String windowName = "Window with Blank Image";
-    namedWindow(windowName);
+    cv::namedWindow(windowName);
     imshow(windowName, image);
     cv::waitKey(0);
-    destroyWindow(windowName);
+    cv::destroyWindow(windowName);
     return 0;
 }

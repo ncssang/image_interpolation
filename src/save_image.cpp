@@ -32,9 +32,9 @@ int main()
         std::cout << "Image is succusfully saved to a file" << std::endl;
     }
     cv::String windowName = "The Saved Image"; //Name of the window
-    namedWindow(windowName);                   // Create a window
+    cv::namedWindow(windowName);                   // Create a window
     imshow(windowName, image);                 // Show our image inside the created window.
     cv::waitKey(0); // Wait for any keystroke in the window
-    destroyWindow(windowName); //destroy the created window
+    cv::destroyWindow(windowName); //destroy the created window
     return 0;
 }
